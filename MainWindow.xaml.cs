@@ -11,7 +11,7 @@ using System.Windows.Threading;
 
 namespace Flappy
 {
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, IGameField
     {
         private DispatcherTimer mainTimer;
         private ObjectsPool<Obstacle> obstaclesPool;
@@ -24,48 +24,74 @@ namespace Flappy
 
         private bool isRestart;
 
-        public const int GROUND_Y = 472;
-        public const double MOVE_SPEED = 10.5;
+        private const double GroundYPos = 472.0;
+        private const double Speed = 10.5;
 
-        public MainWindow()
+        /// <summary>
+        /// Позиция земли по вертикали
+        /// </summary>
+        public double GroundPosition
         {
-            InitializeComponent();
+            get { return GroundYPos; }
         }
 
+        /// <summary>
+        /// Скорость движения
+        /// </summary>
+        public double MoveSpeed
+        {
+            get { return Speed; }
+        }
+
+        /// <summary>
+        /// Ширина поля
+        /// </summary>
+        public double FieldWidth
+        {
+            get { return this.ActualWidth; }
+        }
+
+        // Начать новую игру
         private void StartGame()
         {
             this.time = 0;
             this.score = -1;
             AdvanceScore(this, null);
+
             if (!isRestart)
             {
                 mainTimer = new DispatcherTimer();
                 mainTimer.Interval = new TimeSpan(0, 0, 0, 0, 30);
                 mainTimer.Tick += mainTimer_Tick;
 
-                obstaclesPool = new ObjectsPool<Obstacle>(obstacle =>
-                    obstacle.EarnScore += AdvanceScore);
+                obstaclesPool = new ObjectsPool<Obstacle>(obstacle => {
+                    obstacle.Field = this;
+                    obstacle.EarnScore += AdvanceScore;
+                });
                 obstacles = new Queue<Obstacle>();
-                ground = new TiledGround(cnvGraph, (int)this.Width);
-                flappy = new Player(imgPiggy, 
-                    new Size(this.Width, this.Height));
+                ground = new TiledGround(cnvGraph, this);
+                flappy = new Player(imgPiggy, this);
             }
             else
             {
                 foreach (var obstacle in obstacles)
+                {
                     obstacle.Detach();
+                }
                 obstacles.Clear();
                 obstaclesPool.ReleaseAll();
             }
             mainTimer.Start();
         }
 
+        // Увеличить количество очков
         private void AdvanceScore(object sender, EventArgs e)
         {
             score++;
             tbScore.Text = score.ToString();
         }
 
+        // Обновить состояние игры
         private void UpdateGame()
         {
             bool needDelete = false;
@@ -86,6 +112,7 @@ namespace Flappy
                     needDelete = true;
                 }
             }
+            // Удалить препятствия, вышедшие за границы поля
             if(needDelete)
             {
                 Obstacle itemForDeletion = obstacles.Dequeue();
@@ -106,6 +133,7 @@ namespace Flappy
             unchecked { time++; }
         }
 
+        // Завершить игру
         private void EndGame()
         {
             mainTimer.Stop();
@@ -128,7 +156,7 @@ namespace Flappy
             EndGame();
         }
 
-        private void UserControl_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void UserControl_MouseLeftButtonDown(object sender, RoutedEventArgs e)
         {
             flappy.Flap();
         }
@@ -136,13 +164,20 @@ namespace Flappy
         private void UserControl_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Space)
+            {
                 flappy.Flap();
+            }
             else if(e.Key == Key.F2)
             {
                 this.isRestart = true;
                 if (!mainTimer.IsEnabled)
                     StartGame();
             }
+        }
+
+        public MainWindow()
+        {
+            InitializeComponent();
         }
     }
 }
