@@ -13,7 +13,7 @@ namespace Flappy
     {
         private const int Width = 75;
         private const int Margin = 100;
-        private const int GapSize = 150;
+        private const int GapSize = 200;
 
         private Canvas Parent;
         private Rectangle[] rects;
@@ -41,13 +41,15 @@ namespace Flappy
         /// <param name="target">Элемент, для которого будет произведена проверка</param>
         public bool HitTest(Player target)
         {
+            const double Padding = 5.0;
+
             double x0 = (double)rects[0].GetValue(Canvas.LeftProperty);
             double x1 = x0 + Width;
 
-            double tX0 = target.Location.X;
-            double tY0 = target.Location.Y;
-            double tX1 = tX0 + target.Size.Width;
-            double tY1 = tY0 + target.Size.Height;
+            double tX0 = target.Location.X + Padding;
+            double tY0 = target.Location.Y + Padding;
+            double tX1 = tX0 + target.Size.Width - Padding;
+            double tY1 = tY0 + target.Size.Height - Padding;
 
             // Проверка на возможность получения очка
             if(!scoreEarned && tX1 > x1)
@@ -106,6 +108,7 @@ namespace Flappy
             int maxGapSize = (int)Field.GroundPosition - Margin * 2;
             int gapStart = rnd.Next(Margin, maxGapSize);
 
+            rects[0].SetValue(Canvas.TopProperty, 0.0);
             rects[0].Height = gapStart;
             rects[1].SetValue(Canvas.TopProperty, (double)gapStart + GapSize);
             rects[1].Height = Field.GroundPosition - GapSize - gapStart;

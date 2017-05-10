@@ -173,6 +173,10 @@ namespace Flappy
                 if (!mainTimer.IsEnabled)
                     StartGame();
             }
+            else if (e.Key == Key.Escape)
+            {
+                this.Close();
+            }
         }
 
         public MainWindow()

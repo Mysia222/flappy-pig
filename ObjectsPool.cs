@@ -7,8 +7,7 @@ namespace Flappy
     /// Элемент пула объектов
     /// </summary>
     /// <typeparam name="T">Тип элемента пула</typeparam>
-    internal struct PoolItem<T>
-        where T : new()
+    internal struct PoolItem<T> where T : new()
     {
         /// <summary>
         /// Непосредственный элемент пула объектов
