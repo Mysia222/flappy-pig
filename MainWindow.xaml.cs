@@ -13,6 +13,9 @@ namespace Flappy
 {
     public partial class MainWindow : Window, IGameField
     {
+        private const double GroundYPos = 472.0;
+        private const double Speed = 10.5;
+
         private DispatcherTimer mainTimer;
         private ObjectsPool<Obstacle> obstaclesPool;
 
@@ -24,8 +27,7 @@ namespace Flappy
 
         private bool isRestart;
 
-        private const double GroundYPos = 472.0;
-        private const double Speed = 10.5;
+        private bool isTouched;
 
         /// <summary>
         /// Позиция земли по вертикали
@@ -54,6 +56,8 @@ namespace Flappy
         // Начать новую игру
         private void StartGame()
         {
+            GameOverScreen.Visibility = Visibility.Hidden;
+
             this.time = 0;
             this.score = -1;
             AdvanceScore(this, null);
@@ -137,6 +141,9 @@ namespace Flappy
         private void EndGame()
         {
             mainTimer.Stop();
+            // Показать финальный счет
+            GameOverScreen.Visibility = Visibility.Visible;
+            ScoreValue.Text = score.ToString();
         }
 
         private void mainTimer_Tick(object sender, EventArgs e)
@@ -144,24 +151,34 @@ namespace Flappy
             UpdateGame();
         }
 
-        private void UserControl_Loaded(object sender, RoutedEventArgs e)
+        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
             this.isRestart = false;
             StartGame();
             this.Focus();
         }
 
-        private void UserControl_Unloaded(object sender, RoutedEventArgs e)
+        private void MainWindow_Unloaded(object sender, RoutedEventArgs e)
         {
             EndGame();
         }
 
-        private void UserControl_MouseLeftButtonDown(object sender, RoutedEventArgs e)
+        private void MainWindow_MouseLeftButtonDown(object sender, RoutedEventArgs e)
         {
-            flappy.Flap();
+            if(!isTouched)
+            {
+                flappy.Flap();
+            }
+            isTouched = false;
         }
 
-        private void UserControl_KeyDown(object sender, KeyEventArgs e)
+        private void Window_TouchDown(object sender, TouchEventArgs e)
+        {
+            flappy.Flap();
+            isTouched = true;
+        }
+
+        private void MainWindow_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Space)
             {
@@ -179,9 +196,16 @@ namespace Flappy
             }
         }
 
+        private void RestartButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.isRestart = true;
+            StartGame();
+        }
+
         public MainWindow()
         {
             InitializeComponent();
+            GameOverScreen.Visibility = Visibility.Hidden;
         }
     }
 }

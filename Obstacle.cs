@@ -46,9 +46,9 @@ namespace Flappy
             double x0 = (double)rects[0].GetValue(Canvas.LeftProperty);
             double x1 = x0 + Width;
 
-            double tX0 = target.Location.X + Padding;
+            double tX0 = target.Location.X;
             double tY0 = target.Location.Y + Padding;
-            double tX1 = tX0 + target.Size.Width - Padding;
+            double tX1 = tX0 + target.Size.Width;
             double tY1 = tY0 + target.Size.Height - Padding;
 
             // Проверка на возможность получения очка
@@ -131,15 +131,22 @@ namespace Flappy
             }
         }
 
+        // Создать кисть
+        private GradientBrush CreateBarBrush(Color side, Color center)
+        {
+            var stops = new GradientStopCollection();
+            stops.Add(new GradientStop() { Color = side, Offset = 0.0 });
+            stops.Add(new GradientStop() { Color = center, Offset = 0.5 });
+            stops.Add(new GradientStop() { Color = side, Offset = 1.0 });
+
+            return new LinearGradientBrush(stops, 0);
+        }
+
         // Установить фон объекта препятствия
         private void SetPipeFill()
         {
-            GradientStopCollection stops = new GradientStopCollection();
             Color colBorder = Color.FromArgb(255, 200, 255, 200);
-            stops.Add(new GradientStop() { Color = colBorder, Offset = 0.0 });
-            stops.Add(new GradientStop() { Color = Colors.Green, Offset = 0.5 });
-            stops.Add(new GradientStop() { Color = colBorder, Offset = 1.0 });
-            GradientBrush gb = new LinearGradientBrush(stops, 0);
+            var gb = CreateBarBrush(colBorder, Colors.Green);
 
             foreach(Rectangle rect in rects)
             {

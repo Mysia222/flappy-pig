@@ -5,12 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Flappy"
         mc:Ignorable="d"
-        Title="MainWindow" Height="600" Width="800"
+        Title="Flappy Oink" Height="600" Width="800"
 		ResizeMode="CanMinimize"
         WindowStartupLocation="CenterScreen"
-		Loaded="UserControl_Loaded" Unloaded="UserControl_Unloaded" 
-		MouseLeftButtonDown="UserControl_MouseLeftButtonDown"
-		KeyDown="UserControl_KeyDown">
+		Loaded="MainWindow_Loaded" Unloaded="MainWindow_Unloaded" 
+		MouseLeftButtonDown="MainWindow_MouseLeftButtonDown"
+		KeyDown="MainWindow_KeyDown" TouchDown="Window_TouchDown">
 		
     <Grid x:Name="LayoutRoot" Background="White">
         <Canvas x:Name="cnvGraph" Margin="0 0 0 0">
@@ -20,17 +20,54 @@
                     <GradientStop Color="White" Offset="1" />
                 </LinearGradientBrush>
             </Canvas.Background>
+            
+            <Image x:Name="Back" Source="background.png" Canvas.ZIndex="0" />
+            
             <Image x:Name="imgPiggy" Source="piggy1.png" Canvas.ZIndex="10"
                    RenderTransformOrigin="0.5,0.5" Canvas.Top="50">
                 <Image.RenderTransform>
                     <RotateTransform Angle="0" x:Name="rtRotation" />
                 </Image.RenderTransform>
             </Image>
-            <TextBlock x:Name="tbScore" FontSize="48" Foreground="White"
-                       Margin="10,0,0,0" Canvas.ZIndex="10">0</TextBlock>
+            
+            <Border Width="100"
+                Canvas.Left="680" Canvas.Top="510"
+                Canvas.ZIndex="10" 
+                Background="#55888888">
+                <TextBlock 
+                    Margin="5,0"
+                    HorizontalAlignment="Right"
+                    x:Name="tbScore" 
+                    FontSize="36" Foreground="White" 
+                    Text="0" />
+            </Border>
+
             <Canvas.Clip>
                 <RectangleGeometry Rect="0 0 800 600" />
             </Canvas.Clip>
         </Canvas>
+        
+        <Border Name="GameOverScreen" Background="#aa000000">
+            <StackPanel Orientation="Vertical"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+                
+                <TextBlock FontSize="72" Foreground="White">Game Over</TextBlock>
+                <TextBlock FontSize="24" Foreground="White" HorizontalAlignment="Center">
+                    <Run>Your score is: </Run>
+                    <Run Name="ScoreValue">#</Run>
+                </TextBlock>
+                
+                <Button
+                    Name="RestartButton"
+                    Width="180" Height="36"
+                    Margin="0,50,0,0"
+                    Background="LightGray" BorderThickness="0"
+                    FontSize="18"
+                    Click="RestartButton_Click">
+                    Retry
+                </Button>
+            </StackPanel>
+        </Border>
     </Grid>
 </Window>
