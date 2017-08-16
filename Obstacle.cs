@@ -12,8 +12,10 @@ namespace Flappy
     public class Obstacle
     {
         private const int Width = 75;
+        private const int CapWidth = Width + 16;
         private const int Margin = 100;
         private const int GapSize = 200;
+        private const int CapHeight = 30;
 
         private Canvas Parent;
         private Rectangle[] rects;
@@ -112,6 +114,8 @@ namespace Flappy
             rects[0].Height = gapStart;
             rects[1].SetValue(Canvas.TopProperty, (double)gapStart + GapSize);
             rects[1].Height = Field.GroundPosition - GapSize - gapStart;
+            rects[2].SetValue(Canvas.TopProperty, (double)gapStart - CapHeight);
+            rects[3].SetValue(Canvas.TopProperty, (double)gapStart + GapSize);
 
             foreach(Rectangle rect in rects)
             {
@@ -146,24 +150,31 @@ namespace Flappy
         private void SetPipeFill()
         {
             Color colBorder = Color.FromArgb(255, 200, 255, 200);
-            var gb = CreateBarBrush(colBorder, Colors.Green);
+            var pipeBrush = CreateBarBrush(colBorder, Colors.Green);
 
-            foreach(Rectangle rect in rects)
-            {
-                rect.Fill = gb;
-            }
+            var capBrush = CreateBarBrush(colBorder, Colors.DarkGreen);
+
+            rects[0].Fill = pipeBrush;
+            rects[1].Fill = pipeBrush;
+            rects[2].Fill = capBrush;
+            rects[3].Fill = capBrush;
         }
 
         // Инициализация объектов, из которых состоит препятствие
         private void Initialize()
         {
-            Brush fill = new SolidColorBrush(Color.FromArgb(255, 255, 255, 0));
-            Rectangle topRect = new Rectangle { Width = Width, Fill = fill };
+            var topRect = new Rectangle { Width = Width };
             topRect.Margin = new Thickness { Top = 0 };
             rects[0] = topRect;
-            Rectangle bottomRect = new Rectangle { Width = Width, Fill = fill };
+            var bottomRect = new Rectangle { Width = Width };
             bottomRect.Margin = new Thickness { Bottom = 0 };
             rects[1] = bottomRect;
+            // Концы
+            var capMargin = new Thickness(-(CapWidth - Width) / 2, 0, 0, 0);
+            rects[2] = new Rectangle { Width = CapWidth, Height = CapHeight };
+            rects[2].Margin = capMargin;
+            rects[3] = new Rectangle { Width = CapWidth, Height = CapHeight };
+            rects[3].Margin = capMargin;
             SetPipeFill();
         }
 
@@ -172,7 +183,7 @@ namespace Flappy
         /// </summary>
         public Obstacle()
         {
-            this.rects = new Rectangle[2];
+            this.rects = new Rectangle[4];
             Initialize();
         }
     }
